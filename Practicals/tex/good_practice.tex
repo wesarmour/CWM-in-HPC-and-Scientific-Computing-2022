@@ -1,0 +1,244 @@
+\documentclass[a4paper, 12pt]{article}
+
+
+%
+% ----- packages
+%
+\usepackage {fancyhdr}
+\usepackage[dvips]{epsfig}
+\usepackage[latin1]{inputenc}
+\usepackage{gensymb}
+
+%
+% ----- settings
+%
+\addtolength{\evensidemargin}{-20mm}
+\addtolength{\oddsidemargin}{-20mm}
+\addtolength{\textwidth}{+34mm}
+\addtolength{\topmargin}{-30mm}
+\addtolength{\textheight}{+24mm}
+\addtolength{\parskip}{+2mm}
+\addtolength{\headsep}{2mm}
+\setlength{\parindent}{0mm}
+
+
+%
+% ----- fancy header
+%
+\setlength  {\headheight}{16pt}
+\pagestyle  {fancyplain}
+
+%\lhead{\fancyplain{}{
+%    \epsfig{figure=artwork/arc_logo_rgb_solid.eps, width=0.08\textwidth}
+%}}
+\rhead{}
+%\rhead{\fancyplain{}{
+%    \epsfig{figure=artwork/ant.eps,                width=0.08\textwidth}
+%}}
+%\lfoot{\fancyplain{}{\bfseries An Introduction to HPC and Scientific Computing -- Compiling and Batch Systems}}
+\rfoot{\fancyplain{}{\bfseries\thepage}}
+
+
+%%%%% of \pageref{LastPage}}}
+
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\cfoot{}
+
+
+%
+% ----- symbols
+%
+
+\def \tld  {$\sim$}
+
+\def \cc   {\tt }               % computer code
+\def \ccem {\tt\bf }            % computer code emphasized
+\def \eg   {{\em e.g.\ }}
+\def \ie   {{\em i.e.\ }}
+
+%
+% ----- part
+%
+\newcommand{\articlesection}[1]{%
+  \thispagestyle{plain}
+  \vspace*{0.4\textheight}
+  \begin{center}
+    {\Huge\bf {#1}}
+  \end{center}
+  \newpage
+}
+
+
+%====================================================================%
+\title{{\Huge\bf An Introduction to HPC and Scientific Computing -- Using Repositories and Good Coding Practice} \\ {\huge -- Practical Sessions --}}
+
+\date{}
+
+\author{\bf
+  \begin{tabular}{ll}
+    Jacob Wilkins & \emph{jacob.wilkins@oerc.ox.ac.uk} \\
+    Ian Bush   & {\em ian.bush@oerc.ox.ac.uk}
+  \end{tabular}
+}
+%====================================================================%
+
+\begin{document}
+
+\maketitle
+
+\vfill
+
+\tableofcontents
+
+\newpage
+
+
+\section{Introduction}
+%        ==========
+\label{Introduction}
+
+In these exercises we will look at using the git revision control system. Remember that {\cc man git}, {\cc git help} and the internet are very good resources for any issues. In particular {\cc man giteveryday} and {\cc man gittutorial} can be very useful. Most commands can take extra ``flags'' or arguments, more detailed help can be found typing {\cc man git-[command]}.
+
+You may also be interested in: {\cc https://githowto.com/setup}
+
+
+Remember, to log in use: \\
+{\cc ssh -CX [username]@oscgate.arc.ox.ac.uk}
+
+{\cc ssh -CX arcus-htc.ox.ac.uk}
+
+\section{Planning}
+Before you start anything, remember that planning is important. On a piece of paper, write a plan for the following problem called ``Langton's Ant'':
+
+Squares on a plane are colored variously either black or white. We arbitrarily identify one square as the ``ant''. The ant can travel in any of the four cardinal directions at each step it takes. The ``ant'' moves according to the rules below:
+
+\begin{itemize}
+    \item{} At a white square, turn 90$^{\circ}$° right, flip the color of the square, move forward one unit
+    \item{} At a black square, turn 90$^{\circ}$ left, flip the color of the square, move forward one unit
+\end{itemize}
+
+Recommended formats for a plan are flow-charts or pseudo-code, but anything reasonable will do. If you don't know what these are, many examples can be found online.
+
+If you have any questions, take a reasonable quality picture of your plan and send it on Slack.
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+%                                                                       %
+%             P A R T   1   --   Using Git on Arcus-b                   %
+%                                                                       %
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Git}
+%        ===========================
+\label{On Arcus-HTC}
+
+Now we shall see if we can use our new knowledge to create and manage a simple repository on arcus-b.
+
+Log onto the cluster and
+
+\begin{enumerate}
+
+   \item First set up the software environment with {\cc module load git}
+
+   \item Create a new directory using {\cc mkdir} and change into it
+
+   \item Now create a repository by using {\cc git init}
+
+   \item Write a program in C that displays ``Hello world'' on the screen. It might be useful to use the example hello.c from practical 1 for inspiration.
+
+   \item Using {\cc git add} and {\cc git commit} add file this to your repository
+     \begin{enumerate}
+     \item{} {\cc git add} takes the files listed after it and ``stages'' them to be committed when you type {\cc git commit}. \\
+       --- {\cc git add myHello.c}
+     \item{} {\cc git commit} tells git to record or update the staged files in your repository, and assign a message so that you know what you changed. Git records which files have been modified and how, so your message should be a brief summary of what your change effected. \\
+       --- {\cc git commit -m "Fixed punctuation in hello statement"}
+     \end{enumerate}
+
+   \item Examine the output of {\cc git status} and {\cc git log} and make sure you understand them
+     \begin{enumerate}
+     \item{} {\cc git status} shows the current status of any changed or not-added files within your repository. \\
+       --- {\cc git status}
+     \item{} {\cc git log} prints the list of messages which you have committed. \\
+       --- {\cc git log}
+     \end{enumerate}
+
+   \item Modify your program to say hello to you specifically rather than to the world in general.
+     \begin{enumerate}
+         \item{} Use {\cc git status} to check your change
+         \item{} Try using {\cc git diff} to see what your change actually changed
+     \end{enumerate}
+
+   \item Update the version in the repository using the appropriate commands.
+
+   \item Update your program again to not only greet you, but also to print your age and check this into the repository.
+
+   \item Write a function in C to calculate the square of an integer. Put this in a separate file to the one with the main program.
+
+   \item Add this new file to the repository.
+
+   \item Modify your main program to call this new function, and use it to print out the square of your age. Make sure you can compile and run this all correctly.
+
+   \item Check the appropriate files into your repository.
+
+   \item Finally you decide that printing out the square of your age makes you feel much too old, and you want to go back to the version where it just printed your name and your age as is. Use the appropriate git commands to go back to this version.
+   \begin{enumerate}
+       \item{} {\cc git reset --hard HEAD\verb#~#N} will revert back N versions
+       \item{} {\cc git reset --hard <hash>} will revert to a given commit
+       \item{} {\cc git checkout <hash> .} will reset the files in the current directory, but may put you in a ``detached head'' state. We will not cover what this means, but the keen can find help online.
+   \end{enumerate}
+
+\end{enumerate}
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+%                                                                       %
+%             P A R T   3   --   Using Git on Remotely                  %
+%                                                                       %
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Accessing a remote Repository}
+%        ===========================
+\label{Remote}
+
+Finally we shall briefly look at using git to get access to a piece of software stored on a remote repository. To do this we shall use the {\cc git clone} command, which makes a copy of a remote repository to give you a local version. We shall look at QuEST, a library developed by Ania Brown, Tyson Jones and Jacob Wilkins which is used to simulate Quantum computers. See
+
+{\cc https://quest.qtechtheory.org/}
+
+for more details.
+
+To access QuEST all you need do is issue the command
+
+{\cc git clone https://github.com/QuEST-Kit/QuEST.git}
+
+This will download the repository and create a new local one in the directory QuEST
+
+\begin{enumerate}
+
+  \item change into QuEST and issue a {\cc git status} command. Is the result what you expect?
+
+  \item Examine the {\cc git log} and see what's there.
+
+  \item Use {\cc git ls-files} to see all the files in the repository. Why are there so many files?
+
+  \item There is an example program using the library in this directory. Read the documentation on how to build it (Note the presence of documentation).
+  \begin{itemize}
+      \item \textbf{N.B.} You may need to {\cc module load cmake}.
+  \end{itemize}
+
+  \item QuEST is written in C, {\cc cd} into the QuEST directory and have a look at the source. Note in particular how constant the style is throughout the code.
+
+\end{enumerate}
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+\end{document}
+
+% end

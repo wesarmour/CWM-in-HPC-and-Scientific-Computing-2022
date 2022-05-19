@@ -1,0 +1,458 @@
+
+\documentclass[a4paper, 12pt]{article}
+
+
+%
+% ----- packages
+%
+\usepackage {fancyhdr}
+\usepackage[dvips]{epsfig}
+
+
+%
+% ----- settings
+%
+\addtolength{\evensidemargin}{-20mm}
+\addtolength{\oddsidemargin}{-20mm}
+\addtolength{\textwidth}{+34mm}
+\addtolength{\topmargin}{-30mm}
+\addtolength{\textheight}{+24mm}
+\addtolength{\parskip}{+2mm}
+\addtolength{\headsep}{2mm}
+\setlength{\parindent}{0mm}
+
+
+%
+% ----- fancy header
+%
+\setlength  {\headheight}{16pt}
+\pagestyle  {fancyplain}
+
+%\lhead{\fancyplain{}{
+%    \epsfig{figure=artwork/arc_logo_rgb_solid.eps, width=0.08\textwidth}
+%}}
+\rhead{}
+%\rhead{\fancyplain{}{
+%    \epsfig{figure=artwork/ant.eps,                width=0.08\textwidth}
+%}}
+%\lfoot{\fancyplain{}{\bfseries An Introduction to HPC and Scientific Computing -- How to multi-task on CPUs using OpenMP}}
+\rfoot{\fancyplain{}{\bfseries\thepage}}
+
+
+%%%%% of \pageref{LastPage}}}
+
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\cfoot{}
+
+
+%
+% ----- symbols
+%
+
+\def \tld  {$\sim$}
+
+\def \cc   {\tt }               % computer code
+\def \ccem {\tt\bf }            % computer code emphasized
+\def \eg   {{\em e.g.\ }}
+\def \ie   {{\em i.e.\ }}
+
+%
+% ----- part
+%
+\newcommand{\articlesection}[1]{%
+  \thispagestyle{plain}
+  \vspace*{0.4\textheight}
+  \begin{center}
+    {\Huge\bf {#1}}
+  \end{center}
+  \newpage
+}
+
+
+%====================================================================%
+\title{{\Huge\bf An Introduction to HPC and Scientific Computing -- How to Multi-task on CPUs Using OpenMP} \\ {\huge -- Practical Sessions --}}
+
+\date{}
+
+\author{\bf
+  \begin{tabular}{ll}
+    Ian Bush   & {\em ian.bush@oerc.ox.ac.uk}
+  \end{tabular}
+}
+%====================================================================%
+
+\begin{document}
+
+\maketitle
+
+\vfill
+
+\tableofcontents
+
+\newpage
+
+
+\section{Introduction}
+%        ==========
+\label{Introduction}
+
+In these exercises we will look at programming with OpenMP. When answering them firstly
+remember to always check that any programs you have written are correct, it doesn't matter
+how fast it runs or how well it scales if the answers are wrong! Secondly in some of the
+questions you are asked to look at the performance of the code. To do this you really
+must do this with the batch system (we provide the batch scripts) as running on the front
+end will not give reliable timings due to the interaction with other users.
+
+The practicals will be performed on arcus-htc. Log on using the username and password that have been provided,
+and the files are under the directory {\cc lecture6}
+
+Remember, to log in use: \\
+{\cc ssh -CX [username]@oscgate.arc.ox.ac.uk}
+
+{\cc ssh -CX arcus-htc}
+
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+%                                                                       %
+%             P A R T   1   --   Hello World                            %
+%                                                                       %
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Hello World}
+%        ==========
+\label{basics}
+
+\subsection*{About}
+%            -----
+
+This exercise introduces the basic functionality of OpenMP with
+one of the simplest programs possible, the ``hello world'' code.  The source
+files are found in the directory {\cc hello}:
+%
+\begin{itemize}
+  \item {\cc hello\_omp.c} -- the OpenMP ``hello world'' program 
+\end{itemize}
+%
+
+\subsection*{Tasks}
+%            -----
+
+\begin{enumerate}
+
+  \item Before we start each question we need to set up the software 
+    environment. First issue a {\cc module purge} command to ensure
+    that you are stating from a clean sheet. Now we need to load
+    the module that makes the compiler available.
+    Throughout these exercises we shall use gnu compiler. To load this issue 
+    {\cc module load gcc}. If you have time at the end
+    you might to try the practicals with the intel
+    compiler. If so instead use {\cc module load intel-compilers}.
+    You won't need to change any of your programs if you do this, but the
+    makefiles will need changing as the intel compiler accepts different flags.
+
+  \item Edit the ``hello world'' program {\cc hello\_omp.c} and try to understand it
+
+  \item Edit the file {\cc makefile} and try to figure out what it
+    does.  Compile the OpenMP ``hello world'' programs by
+    running the command {\cc make}.
+
+  \item Run the executable.  To do this, submit the provided job
+    script {\cc run\_hello\_omp.sh} with the command {\cc sbatch}.  Observe the
+    output, which will be in a file called like {\cc slurmXXXXX.out} created by the batch environment in the directory that you submitted the job, and try to correlate that with the source code.
+
+  \item Run the executable several times.  Does the order in which
+    each thread outputs a message change?
+
+  \item Repeat the exercise but using just 4 threads. How do you achieve this?
+
+\end{enumerate}
+
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+%                                                                       %
+%             P A R T   2   --   Integration                            %
+%                                                                       %
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Trapezoidal Integration}
+%        ===========================
+\label{integral}
+
+
+\subsection*{About}
+%            -----
+
+This exercise is based on a more ``real-life'' application than the
+previous: the computation of a function integral using the trapezoidal
+rule.
+
+The source files are found in the directory {\cc integral}:
+%
+\begin{itemize}
+  \item {\cc integral.c} -- a serial implementation,
+  \item {\cc integral\_omp.c} -- the OpenMP implementation
+\end{itemize}
+%
+
+You are asked to complete the programming of the OpenMP source
+code, starting from the existing files. The OpenMP code uses parallel region
+construct and the OpenMP reduction operation. 
+
+\subsection*{Notes}
+%            -----
+
+\begin{itemize}
+
+  \item The serial implementations use the function {\cc trapInt},
+    defined in file {\cc integral}.  With two real variables ({\cc a}
+    and {\cc b}) and an integer ({\cc N}) as arguments, this function
+    computes the integral of the function {\cc f()} (also defined in
+    {\cc integral}) between {\cc a} and {\cc b}.  {\cc trapInt} uses
+    the simple trapezoidal rule on {\cc N} trapeziums to compute the
+    integral of {\cc f()}.
+    
+  \item All code is programmed to read the parameters {\cc a}, {\cc b}
+    and {\cc N} from standard input.  The standard input can be
+    redirected from a file, such that the exectables can be run in a
+    non-interactive manner.  The input file is provided; to run the
+    serial implementation, for example, the command is {\cc integral <
+      integral.inp}.
+
+  \item All source code uses real numbers in double precision.
+
+  \item Time is measured in the serial code {\cc integral} using the
+    function {\cc wall\_clock\_time} (a wrapper around {\cc
+      gettimeofday}). In the OpenMP code, it is replaced
+    with the OpenMP function {\cc omp\_get\_wtime}, although {\cc
+      wall\_clock\_time} would work just as well.
+\end{itemize}
+
+
+\subsection*{Tasks}
+%            -----
+
+\begin{enumerate}
+
+  \item It's good practice to make sure that you have a clean
+    software environment at the start of each question. So
+    again issue {\cc module purge} and
+    {\cc module load gcc}. Are you sure you
+    understand what these commands are doing?
+
+  \item Compile the serial code ({\cc make integral}) and run it with
+    the command {\cc ./integral < integral.inp}, using the input file
+    provided {\cc integral.inp}.  Using equal values for {\cc a} and
+    {\cc b} but opposite in sign and {\cc N=1024}, the integral value
+    is approximately pi. This is correct as the integral that is being
+    evaluated is {\cc f(x)=2.0*sqrt(1.0-x*x)}, and the bounds are -1 to 1;
+    the analytic answer is exactly pi.
+
+  \item Edit {\cc integral\_omp} and program the threaded computation
+    of the integral.  To achieve this simply transform the original
+    serial {\cc trapInt} function by threading the {\cc for} loop and
+    use the threaded function to compute the integral.  Remember that
+    the OpenMP directive must include a reduction on the integral
+    value variable {\cc v}.  Compile the OpenMP code with the command
+    {\cc make integral\_omp}, run it using the script {\cc
+        run\_integral\_omp.sh} provided and verify that it produces the
+    correct answer: {\cc sbatch run\_integral\_omp.sh}.
+
+  \item Look at how the time to solution for your OpenMP program varies
+    with the number of intervals being used (the last number in the input file),
+    and also the number of threads. Examine 10000, 100000 and 1000000 intervals,
+    and 1, 2, 4, 8 and 16 threads. Plot a speed up curve for your results -
+    Speed up is how much faster a calculation runs on P threads compared to the same
+    calculation on 1 thread, i.e. {\cc S=time(1)/time(P)}. Can you make sense of
+    these results?
+
+\end{enumerate}
+
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{The 1D Heat Equation}
+%        ========================
+\label{heat}
+
+\subsection*{About}
+%            -----
+
+The code in this exercise solves the one-dimensional heat equation
+using finite differences and OpenMP programming.  The
+finite-difference method provides a realistic yet simple algorithmic
+framework to exercise some of the important basic aspects of parallel
+programming: communication, synchronisation and reduction.
+
+The source files are found in the directory {\cc heat}.  The source files are:
+%
+\begin{itemize}
+  \item {\cc heat.c} -- a serial implementation
+  \item {\cc heat\_omp.c} -- the corresponding OpenMP implementation
+  \item {\cc heat\_omp\_easy.c} -- the ``easy'' OpenMP implementation
+\end{itemize}
+
+
+\subsection*{Notes}
+%            -----
+
+Without going deep into the numerical analysis aspects, here are the
+key concepts to help you go though this exercise.
+
+The 1D heat equation is a second order partial differential equation,
+whose solution describes the time-evolution of temperature along a
+heat-conducting rod, starting from an initial prescribed temperature
+distribution.  In this exercise, it is considered that the
+temperatures at both ends (the boundary conditions) of the rod are
+constant (Dirichlet type) and equal to zero.  Mathematically, we seek
+the solution to
+%
+\begin{eqnarray}
+  && \frac{\partial u}{\partial t} = \frac{\partial^2 u}{\partial t^2} \\
+  && u(x, 0) = u_0(x) \\
+  && u(0, t) = u(1, t) = 0
+\end{eqnarray}
+
+The numerical solution to this problem consists of an array of unknown
+temperature values corresponding to equally spaced points along the
+rod at any given time.  The numerical algorithm chosen for this
+exercise updates this array within a discrete time-loop, with all the
+temperature values at one time-level depending on the temperature at
+the previous time-level (explicit scheme).  The outcome of the
+algorithm is thus the temperature distribution at the final simulated
+time.
+
+Assuming the rod extends from 0 to 1, and {\cc n} is the number of
+points along the rod (corresponding to {\cc n-1} equal-length
+intervals), the coordinate of the points are {\cc x[j] = j*dx} with
+{\cc dx = 1/(n-1)} and {\cc j} going from {\cc 0} to {\cc n-1}.
+Also, denoting by {\cc n\_time\_steps} the number of
+time levels for which the solution is computed and by {\cc u} the
+array of temperature values, the numerical algorithm is the following
+time for-loop in C
+%
+\begin{verbatim}
+        // time loop
+        for (t=0; t<n_time_steps; t++) {
+
+          // store the old solution
+          for (j=1; j<n-1; j++) {
+            uo[j] = u[j];
+          }
+
+          // finite difference scheme
+          for (j=1; j<n-1; j++) {
+            u[j] = uo[j] + nu*(uo[j-1]-2.0*uo[j]+uo[j+1]);
+          }
+        }
+\end{verbatim}
+%
+
+The above code snippet represent the core of the serial source code {\cc heat}.
+
+Note how at each time step {\cc n} and before the update, the current
+temperature values in {\cc u} are copied to an additional array {\cc
+  uo}, from which they are used within the update.  (A pointer swap is
+obviously more efficient for achieving this but less clear in an
+exercise.)
+
+The key part of this algorithm is the C line
+%
+\begin{verbatim}
+        u[j] = uo[j] + nu*(uo[j-1]-2.0*uo[j]+uo[j+1]);
+\end{verbatim}
+%
+
+in which {\cc nu} is a constant that has to be less than or equal to 0.5 in
+order to preserve numerical stability of the scheme.  The array values
+{\cc u} are updated based on the values of the previous time-step,
+stored in {\cc uo}.  At each point {\cc j} along the rod, the update
+is carried out in a stencil involving three points along the rod ({\cc
+  j-1}, {\cc j} itself and {\cc j+1} as well as two points along the
+time-line (again {\cc j} but for time steps {\cc t} and {\cc t-1}).
+
+\subsection*{Tasks}
+%           ------
+
+\begin{enumerate}
+  
+  \item Continue practicing the good habit of making sure you have exactly
+    the software environment you need by again issuing {\cc module purge} and
+    {\cc module load gcc}. 
+
+  \item Edit the serial code {\cc heat.c} and try to understand what it
+    is doing.
+
+    \begin{itemize}
+      \item Notice how the data in the finite difference stencil is
+        used, how the maximum change at each time step is evaluated
+        and how the error of the numerical solution is computed at the
+        end of the code.  (Starting from a sinusoidal initial
+        temperature distribution and imposing constant zero
+        temperature at the ends of the rod at all times, the exact
+        analytic solution of the heat equation is known and the error
+        can be measured exactly against this.)
+
+      \item Compile the code with the command {\cc make heat}.  Run
+        the executable using the provided input file ({\cc ./heat <
+          heat.inp}) and using the submission script {\cc
+          run\_heat.sh}.  Also, you can edit {\cc heat.inp} in order to
+        change the parameters of the simulation (number of points
+        along the rod and number of time-steps).
+    \end{itemize}
+
+  \item Edit the OpenMP code {\cc heat\_omp.c} and understand how it differs from the
+    serial version in terms of loop threading.
+
+    \begin{itemize}
+      \item Compile the code with the command {\cc make heat\_omp} and
+        execute the code redirecting the standard input (\ie using
+        {\cc < heat.inp}) to provide the run parameters and using the
+        provided job script {\cc run\_heat\_omp.sh}.
+
+        Check the code is running correctly by comparing the output with the serial code.
+
+      \item Identify the loop that initialises the values of the array
+        {\cc u} and parallelise it using an OpenMP parallel region.
+
+      \item Identify the loop computing the root mean square error
+        between the computed and analytic solution and parallelise it
+        using an OpenMP parallel region.  Is the error value computed
+        close to zero as expected?  Make sure a reduce statement on
+        the variable {\cc rms} exists.  (The parts in the source where
+        you are asked to insert code is marked with ellipsis.)
+    \end{itemize}
+
+
+  \item Measure the performance of the OpenMP code
+    relative to that of the serial code.  In order to do so, use a
+    large number of points ($\sim$ 100k) and a large number of time
+    steps ($\sim$ 10k).  Pay particular attention to the scaling,
+    using 1, 2, 4, 8 and 16 processes/threads.  How do the parallel
+    codes run on 1 thread compare to the serial one?  Does doubling
+    the number of processes/threads double the performance? To do this 
+    you will need to add the timers we used in the integral code to
+    the heat code - when making these additions make sure you are measuring 
+    what you want to measure. It will probably also be useful to modify
+    the code to print out how many threads are being used.
+    Be careful when doing this so that you don't get this being reported 
+    multiple times.
+
+\end{enumerate}
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+\end{document}
+
+% end

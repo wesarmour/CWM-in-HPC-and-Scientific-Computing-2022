@@ -1,0 +1,287 @@
+
+\documentclass[a4paper, 12pt]{article}
+
+
+%
+% ----- packages
+%
+\usepackage {fancyhdr}
+\usepackage[dvips]{epsfig}
+
+
+%
+% ----- settings
+%
+\addtolength{\evensidemargin}{-20mm}
+\addtolength{\oddsidemargin}{-20mm}
+\addtolength{\textwidth}{+34mm}
+\addtolength{\topmargin}{-30mm}
+\addtolength{\textheight}{+24mm}
+\addtolength{\parskip}{+2mm}
+\addtolength{\headsep}{2mm}
+\setlength{\parindent}{0mm}
+
+
+%
+% ----- fancy header
+%
+\setlength  {\headheight}{16pt}
+\pagestyle  {fancyplain}
+
+%\lhead{\fancyplain{}{
+%    \epsfig{figure=artwork/arc_logo_rgb_solid.eps, width=0.08\textwidth}
+%}}
+\rhead{}
+%\rhead{\fancyplain{}{
+%    \epsfig{figure=artwork/ant.eps,                width=0.08\textwidth}
+%}}
+%\lfoot{\fancyplain{}{\bfseries An Introduction to HPC and Scientific Computing -- Compiling and Batch Systems}}
+\rfoot{\fancyplain{}{\bfseries\thepage}}
+
+
+%%%%% of \pageref{LastPage}}}
+
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\cfoot{}
+
+
+%
+% ----- symbols
+%
+
+\def \tld  {$\sim$}
+
+\def \cc   {\tt }               % computer code
+\def \ccem {\tt\bf }            % computer code emphasized
+\def \eg   {{\em e.g.\ }}
+\def \ie   {{\em i.e.\ }}
+
+%
+% ----- part
+%
+\newcommand{\articlesection}[1]{%
+  \thispagestyle{plain}
+  \vspace*{0.4\textheight}
+  \begin{center}
+    {\Huge\bf {#1}}
+  \end{center}
+  \newpage
+}
+
+
+%====================================================================%
+\title{{\Huge\bf An Introduction to HPC and Scientific Computing -- Compiling and Batch Systems} \\ {\huge -- Practical Sessions --}}
+
+\date{}
+
+\author{\bf
+  \begin{tabular}{ll}
+    Jacob Wilkins & {\em jacob.wilkins@oerc.ox.ac.uk} \\
+    Ian Bush   & {\em ian.bush@oerc.ox.ac.uk}
+  \end{tabular}
+}
+%====================================================================%
+
+\begin{document}
+
+\maketitle
+
+\vfill
+
+\tableofcontents
+
+\newpage
+
+
+\section{Introduction}
+%        ==========
+\label{Introduction}
+
+In these exercises we will look at compiling C programs, and introduce use of the batch system.
+
+The practicals will be performed on the cluster. Log on using the username and password that have been provided, and the files are under the directory {\cc notes}
+
+Remember, to log in use: \\
+{\cc ssh -CX [username]@oscgate.arc.ox.ac.uk}
+
+{\cc ssh -CX arcus-htc}
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+%                                                                       %
+%             P A R T   1   --   Hello World                            %
+%                                                                       %
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Hello World}
+%        ==========
+\label{basics}
+
+\subsection*{About}
+%            -----
+
+This exercise introduces compiling with
+one of the simplest programs possible, the ``hello world'' code.  The source
+files are found in the directory {\cc hello}:
+%
+\begin{itemize}
+  \item {\cc hello.c} -- ``hello world'' program 
+\end{itemize}
+%
+
+\subsection*{Tasks}
+%            -----
+
+\begin{enumerate}
+
+  \item Before we start each question we need to set up the software 
+    environment. First issue a {\cc module purge} command to ensure
+    that you are stating from a clean sheet. Now we need to load
+    the module that makes the compiler available.
+    Throughout these exercises we shall use Intel compiler. To load this issue 
+    {\cc module load intel-compilers}. If you have time at the end
+    you might to try the practicals with the gnu
+    compiler. If so instead use {\cc module load gcc binutils}.
+    You won't need to change any of your programs if you do this, but the
+    makefiles will need changing as the gnu compiler accepts different flags, and uses
+    the command gcc to invoke the compiler.
+
+  \item Edit the ``hello world'' program {\cc hello.c} and try to understand it
+
+  \item Compile the program with {\cc icc hello.c}
+
+  \item Use ls to see executable which the compilation has made, {\cc a.out} in this case
+
+  \item Run the executable. does it give the output you expect?
+
+  \item Re-compile, this time with an appropriate flag so the executable is called {\cc hello}
+    Check you have done this successfully via ls, and running the new executable
+
+\end{enumerate}
+
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+%                                                                       %
+%             P A R T   2   --   Makefiles                              %
+%                                                                       %
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Makefiles}
+%        ===========================
+\label{integral}
+
+
+\subsection*{About}
+%            -----
+
+In this exercise we introduce compiling a program which is held in multiple files, and also the
+use of a makefile. The example implements two different ways to orthonormalise a set of vectors,
+i.e. adjust the vectors so that they are all at right angles to each other, and compares the time
+for the two methods. Whilst rather abstract this is actually part of a number of algorithms commonly
+used in computational science.
+
+The source files are found in the directory {\cc gs}:
+%
+\begin{itemize}
+  \item {\cc gs\_opt.c} -- the main code,
+  \item {\cc timer.c} -- routines that implement the timing,
+  \item {\cc array\_alloc.c} -- routines that implement memory allocation
+\end{itemize}
+%
+
+\subsection*{Tasks}
+%            -----
+
+\begin{enumerate}
+
+   \item It's good practice to make sure that you have a clean
+    software environment at the start of each question. So
+    again issue {\cc module purge} and
+    {\cc module load intel-compilers}. Are you sure you
+    understand what these commands are doing?
+
+  \item Compile the code with {\cc icc gs\_opt.c array\_alloc.c timer.c -o gs}. Run the program
+    and enter 1000 for both the order and number of the vectors and look at the output
+
+  \item This command is getting a bit long already with just 3 files! We have also provided
+    a makefile to help you compile this program. Recompile the program by issuing
+    the command {\cc make} and run the program as before
+
+  \item Issue an {\cc ls} command - can you see the object files?
+
+  \item Issue the command {\cc touch timer.c} and then {\cc make}. What happens? How is it
+    different from the previous {\cc make}?
+
+  \item Run the program again with the input as before. Note down the times taken for the two methods.
+
+  \item Open up the makefile with your editor of choice. In it you will see a line looking like
+
+    {\cc CFLAGS = -O0}
+
+    This controls the flags used by the compiler. In particular the {\cc -O} flag controls how hard the compiler
+    works to make an executable that runs quickly. This is called ``optimisation''. A small number, such as zero, means
+    little effort is put in. A large number (the maximum is typically 3) means a lot of work is put in. Change this line to read
+
+    {\cc CFLAGS = -O2}
+
+    recompile the program using {\cc make clean} and then {\cc make} and re-run it. How have the times changed?
+
+  \item try {\cc -O1} and {\cc -O3}, how does this affect the run time? Remember to use {\cc make clean} between each recompile to make
+    sure everything is rebuilt from scratch.
+
+\end{enumerate}
+
+
+%                                                                       %
+% ===================================================================== %
+%                                                                       %
+
+\section{Batch Systems}
+%        ========================
+\label{heat}
+
+\subsection*{About}
+%            -----
+We shouldn't really run any serious jobs on the front end nodes. As you have to share the front end nodes with
+other users the timings we have gathered so far are not that reliable, also they may impede other people's work and get you angry emails from the systems administrator.
+The correct way is to use the compute nodes via
+the batch system. In the {\cc gs} directory you should have also noticed a file called {\cc script.sl}, this is an appropriate
+batch script for the arcus-htc system and we will now use it to run the {\cc gs} program on the compute nodes
+
+\subsection*{Tasks}
+%           ------
+
+\begin{enumerate}
+  
+  \item Examine the {\cc script.sl} with an editor. Do you understand what it does? Think carefully about how it reserves the
+     resources we need to run the program, and also about how the input is provided for the program - on the compute node there won't be a keyboard attached to provide that input!
+  
+  \item Issue the command {\cc sbatch script.sl}. What happens?
+
+  \item Examine the running job with {\cc squeue -u <username>} replacing username as appropriate. Note the the number of the job is the same as that printed out by the {\cc sbatch} command
+
+  \item When the job is finished use {\cc ls} to find the output. You should find a new file in the directory called something
+     similar to {\cc slurm-1702775.out}, where the number will be the same as that printed out by sbatch. Examine the contents of this file.
+
+  \item Re-run the timing exercise from the previous question where you examined how fast the program ran
+     as a function of optimisation level, and see if the ime in batch differes much from that measured on the front end
+
+  \item Rather than {\cc slurm-1702775.out} how can you get the output written to a filename of your choice? \\
+  Slurm's {\cc sbatch} docs might be useful {\cc https://slurm.schedmd.com/sbatch.html}
+
+\end{enumerate}
+
+% %                                                                       %
+% % ===================================================================== %
+% %                                                                       %
+\end{document}
+
+% end
