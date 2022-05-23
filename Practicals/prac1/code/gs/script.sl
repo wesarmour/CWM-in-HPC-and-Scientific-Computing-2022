@@ -10,6 +10,9 @@
 # set name of job
 #SBATCH --job-name gs
 
+# Use our reservation
+#SBATCH --reservation=training23052022
+
 # Use this to set the order and number of vectors
 rm -f in
 echo 1000 >   in
